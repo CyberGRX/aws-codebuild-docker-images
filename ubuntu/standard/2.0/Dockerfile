@@ -107,7 +107,7 @@ RUN apt-get update && apt-get install -y apt-transport-https \
     && apt-get update && apt-get install -y kubectl=${KUBE_CTL_VERSION} python3-pip
 
 #Upgrade awscli
-RUN pip3 install awscli --upgrade --user
+RUN pip3 install awscli --upgrade
 
 #Download and install custom k8s provider
 RUN mkdir -p ~/.terraform.d/plugins/linux_amd64/ \
