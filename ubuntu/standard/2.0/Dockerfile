@@ -58,26 +58,19 @@ RUN set -ex \
        wget python3 python3-dev python3-pip python3-setuptools fakeroot ca-certificates jq \
        netbase gnupg dirmngr procps \
        tar gzip zip autoconf automake \
-       bzip2 file g++ gcc imagemagick \
+       bzip2 file \
        libbz2-dev libc6-dev libcurl4-openssl-dev libdb-dev \
-       libevent-dev libffi-dev libgeoip-dev libglib2.0-dev \
-       libjpeg-dev libkrb5-dev liblzma-dev \
-       libmagickcore-dev libmagickwand-dev libmysqlclient-dev \
        libncurses5-dev libpq-dev libreadline-dev \
        libsqlite3-dev libssl-dev libtool libwebp-dev \
        libxml2-dev libxslt1-dev libyaml-dev make \
        patch xz-utils zlib1g-dev unzip curl \
-       e2fsprogs iptables xfsprogs \
+       e2fsprogs iptables \
        less groff liberror-perl \
-       asciidoc build-essential bzr cvs cvsps docbook-xml docbook-xsl dpkg-dev \
-       libdbd-sqlite3-perl libdbi-perl libdpkg-perl libhttp-date-perl \
-       libio-pty-perl libserf-1-1 libsvn-perl libsvn1 libtcl8.6 libtimedate-perl \
-       libxml2-utils libyaml-perl python-bzrlib python-configobj \
-       sgml-base sgml-data subversion tcl tcl8.6 xml-core xmlto xsltproc \
-       tk gettext gettext-base libapr1 libaprutil1 xvfb expect parallel \
+       asciidoc dpkg-dev \
+       python-configobj \
+       tcl tcl8.6 \
+       tk gettext gettext-base libapr1 libaprutil1 xvfb parallel \
        locales rsync\
-    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF \
-    && echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | tee /etc/apt/sources.list.d/mono-official-stable.list \    
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -115,14 +108,6 @@ RUN mkdir -p ~/.terraform.d/plugins/linux_amd64/ \
     && unzip k8s-provider.zip \
     && mv terraform-provider-kubernetes_${SL1_PMT_VERSION}_x4 ~/.terraform.d/plugins/linux_amd64/terraform-provider-k8s
 
-# Download and set up GitVersion
-RUN set -ex \
-    && wget "https://github.com/GitTools/GitVersion/releases/download/v${GITVERSION_VERSION}/GitVersion-bin-net40-v${GITVERSION_VERSION}.zip" -O /tmp/GitVersion_${GITVERSION_VERSION}.zip \
-    && mkdir -p /usr/local/GitVersion_${GITVERSION_VERSION} \
-    && unzip /tmp/GitVersion_${GITVERSION_VERSION}.zip -d /usr/local/GitVersion_${GITVERSION_VERSION} \
-    && rm /tmp/GitVersion_${GITVERSION_VERSION}.zip \
-    && echo "mono /usr/local/GitVersion_${GITVERSION_VERSION}/GitVersion.exe \$@" >> /usr/local/bin/gitversion \
-    && chmod +x /usr/local/bin/gitversion
 # Install Docker
 RUN set -ex \
     && curl -fSL "https://${DOCKER_BUCKET}/linux/static/${DOCKER_CHANNEL}/x86_64/docker-${DOCKER_VERSION}.tgz" -o docker.tgz \
@@ -140,12 +125,6 @@ RUN set -ex \
     && chmod +x /usr/local/bin/dind /usr/local/bin/docker-compose \
 # Ensure docker-compose works
     && docker-compose version
-
-# https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_CLI_installation.html
-RUN curl -sS -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.11.5/2018-12-06/bin/linux/amd64/aws-iam-authenticator \
-    && curl -sS -o /usr/local/bin/kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.11.5/2018-12-06/bin/linux/amd64/kubectl \
-    && curl -sS -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest \
-    && chmod +x /usr/local/bin/kubectl /usr/local/bin/aws-iam-authenticator /usr/local/bin/ecs-cli
 
 RUN set -ex \
     && pip3 install --upgrade setuptools wheel \
