@@ -56,20 +56,10 @@ RUN set -ex \
     && chmod 600 ~/.ssh/known_hosts \
     && apt-get install -y --no-install-recommends \
        wget python3 python3-dev python3-pip python3-setuptools fakeroot ca-certificates jq \
-       netbase gnupg dirmngr procps \
-       tar gzip zip autoconf automake \
-       bzip2 file \
-       libbz2-dev libc6-dev libcurl4-openssl-dev libdb-dev \
-       libncurses5-dev libpq-dev libreadline-dev \
-       libsqlite3-dev libssl-dev libtool libwebp-dev \
-       libxml2-dev libxslt1-dev libyaml-dev make \
-       patch xz-utils zlib1g-dev unzip curl \
-       e2fsprogs iptables \
-       less groff liberror-perl \
-       asciidoc dpkg-dev \
-       python-configobj \
-       tcl tcl8.6 \
-       tk gettext gettext-base libapr1 libaprutil1 xvfb parallel \
+       netbase gnupg tar gzip zip autoconf automake bzip2 file \
+       libbz2-dev libc6-dev libcurl4-openssl-dev libssl-dev libyaml-dev \
+       patch xz-utils zlib1g-dev unzip curl less dpkg-dev \
+       python-configobj parallel \
        locales rsync\
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
