@@ -56,7 +56,7 @@ RUN set -ex \
     && chmod 600 ~/.ssh/known_hosts \
     && apt-get install -y --no-install-recommends \
        wget python3 python3-dev python3-pip python3-setuptools fakeroot ca-certificates jq \
-       netbase gnupg dirmngr bzr mercurial procps \
+       netbase gnupg dirmngr procps \
        tar gzip zip autoconf automake \
        bzip2 file g++ gcc imagemagick \
        libbz2-dev libc6-dev libcurl4-openssl-dev libdb-dev \
@@ -68,14 +68,14 @@ RUN set -ex \
        libxml2-dev libxslt1-dev libyaml-dev make \
        patch xz-utils zlib1g-dev unzip curl \
        e2fsprogs iptables xfsprogs \
-       mono-devel less groff liberror-perl \
+       less groff liberror-perl \
        asciidoc build-essential bzr cvs cvsps docbook-xml docbook-xsl dpkg-dev \
        libdbd-sqlite3-perl libdbi-perl libdpkg-perl libhttp-date-perl \
        libio-pty-perl libserf-1-1 libsvn-perl libsvn1 libtcl8.6 libtimedate-perl \
        libxml2-utils libyaml-perl python-bzrlib python-configobj \
        sgml-base sgml-data subversion tcl tcl8.6 xml-core xmlto xsltproc \
        tk gettext gettext-base libapr1 libaprutil1 xvfb expect parallel \
-       locales rsync jq\
+       locales rsync\
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF \
     && echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | tee /etc/apt/sources.list.d/mono-official-stable.list \    
     && rm -rf /var/lib/apt/lists/* \
