@@ -160,22 +160,6 @@ COPY runtimes.yml /codebuild/image/config/runtimes.yml
 
 COPY dockerd-entrypoint.sh /usr/local/bin/
 
-#**************** RUBY *********************************************************
-
-ENV RBENV_SRC_DIR="/usr/local/rbenv"
-
-ENV PATH="/root/.rbenv/shims:$RBENV_SRC_DIR/bin:$RBENV_SRC_DIR/shims:$PATH" \
-    RUBY_BUILD_SRC_DIR="$RBENV_SRC_DIR/plugins/ruby-build"
-
-RUN set -ex \
-    && git clone https://github.com/rbenv/rbenv.git $RBENV_SRC_DIR \
-    && mkdir -p $RBENV_SRC_DIR/plugins \
-    && git clone https://github.com/rbenv/ruby-build.git $RUBY_BUILD_SRC_DIR \
-    && sh $RUBY_BUILD_SRC_DIR/install.sh \
-    && rbenv install $RUBY_VERSION && rbenv global $RUBY_VERSION
-
-#**************** END RUBY *****************************************************
-
 #****************        PYTHON     ********************************************* 
 ENV PATH="/usr/local/bin:$PATH" \
     GPG_KEY="0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D" \
@@ -237,21 +221,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         && rm -fr /var/lib/apt/lists/*
 #****************      END PYTHON     ********************************************* 
 
-#****************      NODEJS     ****************************************************
-
- ENV N_SRC_DIR="$SRC_DIR/n"
-
- RUN git clone https://github.com/tj/n $N_SRC_DIR \
-     && cd $N_SRC_DIR && make install \
-     && n $NODE_8_VERSION && npm install --save-dev -g grunt && npm install --save-dev -g grunt-cli && npm install --save-dev -g webpack \
-     && n $NODE_VERSION && npm install --save-dev -g grunt && npm install --save-dev -g grunt-cli && npm install --save-dev -g webpack \
-     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-     && apt-get update && apt-get install -y --no-install-recommends yarn \
-     && cd / && rm -rf $N_SRC_DIR; 
-
-#****************      END NODEJS     ****************************************************
-
 
 #****************     GO     **********************************************************
 ENV GOLANG_DOWNLOAD_SHA256="aea86e3c73495f205929cfebba0d63f1382c8ac59be081b6351681415f4063cf" \
@@ -275,35 +244,3 @@ RUN set -ex \
 ENV PATH="$GOPATH/bin:/usr/local/go/bin:$PATH"
 #****************     END GO     **********************************************************
 
-#****************    HEADLESS BROWSERS     *******************************************************
-RUN set -ex \
-    && apt-add-repository -y "deb http://archive.canonical.com/ubuntu $(lsb_release -sc) partner" \
-    && apt-add-repository -y ppa:malteworld/ppa && apt-get update \
-    && apt-get install -y libgtk-3-0 libglib2.0-0 libdbus-glib-1-2 libdbus-1-3 libasound2 \
-    && wget -O ~/FirefoxSetup.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64" \
-    && tar xjf ~/FirefoxSetup.tar.bz2 -C /opt/ \
-    && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
-    && rm ~/FirefoxSetup.tar.bz2 \
-    && firefox --version
-
-# Install Chrome
-
-RUN set -ex \
-    && curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install) \
-    && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
-    && sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' "/opt/google/chrome/google-chrome" \
-    && google-chrome --version
-
-# Install ChromeDriver
-
-RUN set -ex \
-    && CHROME_VERSION=`google-chrome --version | awk -F '[ .]' '{print $3"."$4"."$5}'` \
-    && CHROME_DRIVER_VERSION=`wget -qO- chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION` \
-    && wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver_linux64.zip -d /opt \
-    && rm /tmp/chromedriver_linux64.zip \
-    && mv /opt/chromedriver /opt/chromedriver-$CHROME_DRIVER_VERSION \
-    && chmod 755 /opt/chromedriver-$CHROME_DRIVER_VERSION \
-    && ln -s /opt/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver \
-    && chromedriver --version
