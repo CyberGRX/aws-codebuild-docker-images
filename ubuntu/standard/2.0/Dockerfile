@@ -197,7 +197,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && mkdir -p /usr/src/python \
     && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
     && rm python.tar.xz \
-    \
     && cd /usr/src/python \
     && ./configure \
         --enable-loadable-sqlite-extensions \
@@ -235,7 +234,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -s pydoc3 pydoc \
     && ln -s python3 python \
     && ln -s python3-config python-config \
-        && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        && rm -fr /var/lib/apt/lists/*
 #****************      END PYTHON     ********************************************* 
 
 #****************      NODEJS     ****************************************************
