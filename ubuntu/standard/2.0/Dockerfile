@@ -59,7 +59,7 @@ RUN set -ex \
        netbase gnupg tar gzip zip autoconf automake bzip2 file \
        libbz2-dev libc6-dev libcurl4-openssl-dev libssl-dev libyaml-dev \
        patch xz-utils zlib1g-dev unzip curl less dpkg-dev \
-       python-configobj parallel \
+       python-configobj parallel iptables \
        locales rsync\
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
