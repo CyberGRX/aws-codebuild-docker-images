@@ -4,7 +4,14 @@ phases:
   install:
     runtime-versions:
       docker: 18
+  pre_build:
+    commands:
+      $(aws ecr get-login --no-include-email --region us-east-1)
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/ubuntu/standard/2.0
       - docker build -t aws-codebuild-docker .
+  post_build:
+    commands:
+      - docker tag aws-codebuild-docker:latest 746807083977.dkr.ecr.us-east-1.amazonaws.com/$PROJECT:latest
+      - docker push 746807083977.dkr.ecr.us-east-1.amazonaws.com/$PROJECT:latest
