@@ -1,4 +1,4 @@
-# Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License.
 # A copy of the License is located at
@@ -220,7 +220,6 @@ RUN     n $NODE_10_VERSION && npm install --save-dev -g -f grunt && npm install 
      && yarn --version \
      && cd / && rm -rf $N_SRC_DIR;rm -rf /tmp/*
 
-
 #****************      END NODEJS     ****************************************************
 
 #**************** RUBY *********************************************************
@@ -424,26 +423,23 @@ RUN set -ex \
 
 #=======================End of layer: openjdk  =================
 
-FROM runtimes_n_openjdk AS std_v1
+FROM runtimes_n_openjdk AS std_v3
 
 #Prune nonactive runtimes.
 RUN rm  -rf /root/.dotnet/sdk/*
-RUN n rm $NODE_12_VERSION
-RUN goenv  uninstall -f $GOLANG_12_VERSION
-RUN goenv  uninstall -f $GOLANG_13_VERSION
 RUN phpenv uninstall -f $PHP_74_VERSION
-RUN pyenv  uninstall -f $PYTHON_38_VERSION
+RUN pyenv  uninstall -f $PYTHON_37_VERSION
 RUN rbenv  uninstall -f $RUBY_27_VERSION
 
-# Docker 18
+#Docker 19
 ENV DOCKER_BUCKET="download.docker.com" \
     DOCKER_CHANNEL="stable" \
     DIND_COMMIT="3b5fac462d21ca164b3778647420016315289034" \
     DOCKER_COMPOSE_VERSION="1.24.0" \
     SRC_DIR="/usr/src"
 
-ENV DOCKER_SHA256="1f3f6774117765279fce64ee7f76abbb5f260264548cf80631d68fb2d795bb09"
-ENV DOCKER_VERSION="18.09.6"
+ENV DOCKER_SHA256="c3c8833e227b61fe6ce0bc5c17f97fa547035bef4ef17cf6601f30b0f20f4ce5"
+ENV DOCKER_VERSION="19.03.3"
 
 RUN set -ex \
     && curl -fSL "https://${DOCKER_BUCKET}/linux/static/${DOCKER_CHANNEL}/x86_64/docker-${DOCKER_VERSION}.tgz" -o docker.tgz \
@@ -451,7 +447,7 @@ RUN set -ex \
     && tar --extract --file docker.tgz --strip-components 1  --directory /usr/local/bin/ \
     && rm docker.tgz \
     && docker -v \
-# set up subuid/subgid so that "--userns-remap=default" works out-of-the-box
+## set up subuid/subgid so that "--userns-remap=default" works out-of-the-box
     && addgroup dockremap \
     && useradd -g dockremap dockremap \
     && echo 'dockremap:165536:65536' >> /etc/subuid \
@@ -459,18 +455,18 @@ RUN set -ex \
     && wget -nv "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind" -O /usr/local/bin/dind \
     && curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/dind /usr/local/bin/docker-compose \
-# Ensure docker-compose works
+## Ensure docker-compose works
     && docker-compose version
 
 VOLUME /var/lib/docker
 
-#Dotnet 
-ENV DOTNET_22_SDK_VERSION="2.2.402"
+#Dotnet
+ENV DOTNET_30_SDK_VERSION="3.0.102"
 ENV DOTNET_ROOT="/root/.dotnet"
 RUN set -ex  \
-    && /usr/local/bin/dotnet-install.sh -v $DOTNET_22_SDK_VERSION \
-    && dotnet --list-sdks \
-    && rm -rf /tmp/*
+&& /usr/local/bin/dotnet-install.sh -v $DOTNET_30_SDK_VERSION \
+&& dotnet --list-sdks \
+&& rm -rf /tmp/*
 
 ## Trigger the population of the local package cache
 ENV NUGET_XMLDOC_MODE skip
@@ -488,37 +484,16 @@ RUN set -ex \
     && dotnet tool install --global GitVersion.Tool --version $GITVERSION_VERSION \
     && ln -s ~/.dotnet/tools/dotnet-gitversion /usr/local/bin/gitversion
 
-#Node 8
-ENV NODE_8_VERSION=8.11.0
-RUN n $NODE_8_VERSION && npm install --save-dev -g -f grunt && npm install --save-dev -g -f grunt-cli && npm install --save-dev -g -f webpack
-
-#Golang 1.11
-ENV GOLANG_11_VERSION=1.11.4
-RUN goenv install $GOLANG_11_VERSION; rm -rf /tmp/*
-RUN goenv  global $GOLANG_11_VERSION
-
 #Activate the desired runtime versions.
-RUN n $NODE_10_VERSION
-RUN pyenv  global $PYTHON_37_VERSION
+RUN n $NODE_12_VERSION
+RUN pyenv  global $PYTHON_38_VERSION
 RUN phpenv global $PHP_73_VERSION
 RUN rbenv  global $RUBY_26_VERSION
+RUN goenv  global $GOLANG_13_VERSION
 
-#Make Java8 as default jdk
-ENV JAVA_HOME="$JAVA_8_HOME" \
-    JRE_HOME="$JRE_8_HOME" \
-    JDK_HOME="$JDK_8_HOME" 
-
-RUN set -x \
-    && for tool_path in "$JAVA_8_HOME"/bin/* "$JRE_8_HOME"/bin/*; do \
-       tool=`basename "$tool_path"`; \
-       if [ $tool != 'java-rmi.cgi' ]; then \
-        update-alternatives --list "$tool" | grep -q "$tool_path" \
-        && update-alternatives --set "$tool" "$tool_path"; \
-       fi; \
-      done
-
-## Configure SSH
+# Configure SSH
 COPY ssh_config /root/.ssh/config
+COPY runtimes.yml /codebuild/image/config/runtimes.yml
 COPY dockerd-entrypoint.sh /usr/local/bin/
 COPY legal/THIRD_PARTY_LICENSES.txt /usr/share/doc
 COPY legal/bill_of_material.txt     /usr/share/doc
@@ -526,5 +501,4 @@ COPY amazon-ssm-agent.json          /etc/amazon/ssm/
 
 ENTRYPOINT ["dockerd-entrypoint.sh"]
 
-#=======================End of std_v1  =================
-
+#=======================End of std_v3  =================

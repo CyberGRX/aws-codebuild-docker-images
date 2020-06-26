@@ -66,10 +66,10 @@ runtimes:
           - goenv global  $GOLANG_13_VERSION
   python:
     versions:
-      3.7:
+      3.8:
         commands:
-          - echo "Installing Python version 3.7 ..."
-          - pyenv global  $PYTHON_37_VERSION
+          - echo "Installing Python version 3.8 ..."
+          - pyenv global  $PYTHON_38_VERSION
   php:
     versions:
       7.3:
@@ -88,18 +88,17 @@ runtimes:
         commands:
           - echo "Installing Node.js version 10 ..."
           - n $NODE_10_VERSION
-      8:
+      12:
         commands:
-          - echo "Installing Node.js version 8 ..."
-          - n $NODE_8_VERSION
+          - echo "Installing Node.js version 12 ..."
+          - n $NODE_12_VERSION
   docker:
     versions:
       18:
         commands:
-          - echo "Installing Docker version 18 ..."
+          - echo "Specifying docker version in buildspec is deprecated. Using docker $DOCKER_VERSION ."
   dotnet:
     versions:
-      2.2:
+      3.0:
         commands:
-          - echo "Installing .NET version 2.2 ..."
-
+          - echo "Installing .NET version 3.0 ..."

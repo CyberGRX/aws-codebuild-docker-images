@@ -1,24 +1,11 @@
 version: 0.1
 
 runtimes:
-  android:
-    versions:
-      28:
-        requires:
-          java: ["openjdk8"]
-        commands:
-          - echo "Installing Android version 28 ..."
-      29:
-        requires:
-          java: ["openjdk8"]
-        commands:
-          - echo "Installing Android version 29 ..."
-
   java:
     versions:
-      openjdk11:
+      corretto11:
         commands:
-          - echo "Installing Java version 11 ..."
+          - echo "Installing corretto (OpenJDK) version 11 ..."
 
           - export JAVA_HOME="$JAVA_11_HOME"
 
@@ -27,17 +14,17 @@ runtimes:
           - export JDK_HOME="$JDK_11_HOME"
 
           - |-
-            for tool_path in "$JAVA_HOME"/bin/*;
+            for tool_path in "$JAVA_HOME"/bin/*; 
              do tool=`basename "$tool_path"`;
-              if [ $tool != 'java-rmi.cgi' ];
-              then
-               update-alternatives --list "$tool" | grep -q "$tool_path" \
-                && update-alternatives --set "$tool" "$tool_path";
-              fi;
+              if [ $tool != 'java-rmi.cgi' ]; 
+              then 
+               rm -f /usr/bin/$tool /var/lib/alternatives/$tool \
+                && update-alternatives --install /usr/bin/$tool $tool $tool_path 20000;
+              fi; 
             done
-      openjdk8:
+      corretto8:
         commands:
-          - echo "Installing Java version 8 ..."
+          - echo "Installing corretto (OpenJDK) version 8 ..."
 
           - export JAVA_HOME="$JAVA_8_HOME"
 
@@ -50,8 +37,8 @@ runtimes:
              do tool=`basename "$tool_path"`;
               if [ $tool != 'java-rmi.cgi' ];
               then
-              update-alternatives --list "$tool" | grep -q "$tool_path" \
-               && update-alternatives --set "$tool" "$tool_path";
+               rm -f /usr/bin/$tool /var/lib/alternatives/$tool \
+                && update-alternatives --install /usr/bin/$tool $tool $tool_path 20000;
               fi;
             done
   golang:
@@ -59,19 +46,32 @@ runtimes:
       1.12:
         commands:
           - echo "Installing Go version 1.12 ..."
-          - goenv global  $GOLANG_12_VERSION
+          - rm -rf /usr/local/go
+          - ln -s /usr/local/go12 /usr/local/go
       1.13:
         commands:
           - echo "Installing Go version 1.13 ..."
-          - goenv global  $GOLANG_13_VERSION
+          - rm -rf /usr/local/go
+          - ln -s /usr/local/go13 /usr/local/go
+      1.14:
+        commands:
+          - echo "Installing Go version 1.14 ..."
   python:
     versions:
+      3.8:
+        commands:
+          - echo "Installing Python version 3.8 ..."
+          - pyenv global  $PYTHON_38_VERSION
       3.7:
         commands:
           - echo "Installing Python version 3.7 ..."
           - pyenv global  $PYTHON_37_VERSION
   php:
     versions:
+      7.4:
+        commands:
+          - echo "Installing PHP version 7.4 ..."
+          - phpenv global $PHP_74_VERSION
       7.3:
         commands:
           - echo "Installing PHP version 7.3 ..."
@@ -82,24 +82,27 @@ runtimes:
         commands:
           - echo "Installing Ruby version 2.6 ..."
           - rbenv global $RUBY_26_VERSION
+      2.7:
+        commands:
+          - echo "Installing Ruby version 2.7 ..."
+          - rbenv global $RUBY_27_VERSION
   nodejs:
     versions:
       10:
         commands:
           - echo "Installing Node.js version 10 ..."
           - n $NODE_10_VERSION
-      8:
+      12:
         commands:
-          - echo "Installing Node.js version 8 ..."
-          - n $NODE_8_VERSION
+          - echo "Installing Node.js version 12 ..."
+          - n $NODE_12_VERSION
   docker:
     versions:
-      18:
+      19:
         commands:
-          - echo "Installing Docker version 18 ..."
+          - echo "Using Docker 19"
   dotnet:
     versions:
-      2.2:
+      3.1:
         commands:
-          - echo "Installing .NET version 2.2 ..."
-
+          - echo "Installing .NET version 3.1 ..."
